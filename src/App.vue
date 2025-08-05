@@ -4,6 +4,7 @@
 
     <!-- Langkah 1: Masukkan jumlah pemain -->
     <div v-if="step === 'input-count'">
+      <label for="playerCount">Jumlah pemain:</label>
       <input
         v-model.number="playerCount"
         type="number"
