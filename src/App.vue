@@ -121,7 +121,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 
 const step = ref("input-count");
 const playerCount = ref(3);
@@ -137,8 +137,30 @@ const question2 = ref("");
 
 const maxImpostors = computed(() => Math.floor(playerCount.value / 2));
 
+// Load saved names from localStorage
+function loadSavedNames() {
+  const saved = localStorage.getItem("game-kartu-player-names");
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  return [];
+}
+
+// Save names to localStorage
+function saveNames() {
+  const namesToSave = playerNames.value.filter((name) => name.trim() !== "");
+  localStorage.setItem("game-kartu-player-names", JSON.stringify(namesToSave));
+}
+
 function goToNameInput() {
+  const savedNames = loadSavedNames();
   playerNames.value = Array(playerCount.value).fill("");
+
+  // Auto-fill with saved names
+  for (let i = 0; i < Math.min(savedNames.length, playerCount.value); i++) {
+    playerNames.value[i] = savedNames[i];
+  }
+
   // Reset impostor count if it exceeds new max
   if (impostorCount.value > maxImpostors.value) {
     impostorCount.value = 1;
@@ -151,6 +173,8 @@ const allNamesFilled = computed(() =>
 );
 
 function goToModeratorInput() {
+  // Save names when proceeding
+  saveNames();
   step.value = "moderator-input";
 }
 
